@@ -42,7 +42,7 @@ class Employee:
 
         total_work = f"{hours}:{minutes}"
 
-        if hours <= 1:# if employee worked more than 1 hour then no missing in (check_in, check_out)
+        if hours < 4:# if employee worked more than 4 hour then no missing in (check_in, check_out)
             if time_log[0].hour >= 12:# if its pm so missing check_in
                 check_in = "Missing"
                 total_work = "Missing check_in"
@@ -63,6 +63,19 @@ class Employee:
                 self.logs[date1.date()] = []
             date1 += timedelta(days=1)
 
+    def calc_late(self,worked_hour):
+        total_work = 0
+        worked_time = worked_hour.split(':')
+        if len(worked_time) > 1:
+            total_work += int(worked_time[0]) * 60 + int(worked_time[1])
+        else:
+            return 0
+
+        late = max(8 * 60 - total_work, 0)
+        if late <= 2 * 60:
+            return late
+        else:
+            return 0
 
     def fetch_data(self, exceptions_dayes = [], exceptions_dates = []):
         data = []
@@ -73,7 +86,9 @@ class Employee:
                 continue
             value = self.logs[key]
             check_in, check_out, worked_hours = self.time_handle(value)
-            data.append([self.id, self.name , self.department, key.strftime("%m/%d/%Y"), check_in, check_out, worked_hours])
+            late = self.calc_late(worked_hours)
+            late_str = f"{late // 60}:{late % 60}"
+            data.append([self.id, self.name , self.department, key.strftime("%m/%d/%Y"), check_in, check_out, worked_hours, late_str])
 
         return data
 

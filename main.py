@@ -47,28 +47,27 @@ for key in sorted(employees):
 wb = Workbook()
 ws = wb.active
 
-column_names = ["No.", "Name", "Department", "date", "check_in", "check_out", "worked_hours"]
+column_names = ["No.", "Name", "Department", "date", "check_in", "check_out", "worked_hours", "late"]
 ws.append(column_names)
 
 fill = PatternFill(start_color="000000", end_color="000000", fill_type="solid")
 font = Font(color="FFFFFF")
 
-columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 for i in range(0,len(columns)):
     ws.column_dimensions[columns[i]].width = 25
 
-total_work = 0
 
 for key in sorted(employees):
     emp_data = employees[key].fetch_data(exceptions_dayes = exceptions_dayes,exceptions_dates = exceptions_dates)
-    total_work = 0
+    total_late = 0
     for row in emp_data:
         ws.append(row)
-        worked_time = row[-1].split(':')
-        if len(worked_time) > 1:
-            total_work += int(worked_time[0]) * 60 + int(worked_time[1])
+        late_time = row[-1].split(':')
+        if len(late_time) > 1:
+            total_late += int(late_time[0]) * 60 + int(late_time[1])
     
-    ws.append(['','','','','','',f"{total_work // 60}:{total_work % 60}"]) # empty row
+    ws.append(['','','','','','','',f"{total_late // 60}:{total_late % 60}"]) # empty row
     for cell in ws[ws.max_row]:
         cell.fill = fill
         cell.font = font
